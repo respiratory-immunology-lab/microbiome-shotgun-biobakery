@@ -1,7 +1,7 @@
 Using biobakery3 tools for metagenomics and metatranscriptomics sequencing
 ==========================================================================
 
-This pipeline is based on [Biobakery](https://github.com/biobakery/biobakery) tools for shotgun metagenomics and metatranscriptomics profiling. This pipeline has been optimised to work on MASSIVE cluster.
+This pipeline is based on [Biobakery](https://github.com/biobakery/biobakery) tools for shotgun metagenomics and metatranscriptomics profiling. This pipeline has been optimised to work on MASSIVE cluster for parallel processing of multiple samples.
 
 ## Biobakery tools installation on the cluster
 
