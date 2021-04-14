@@ -118,13 +118,13 @@ for f in kneaddata_output/*_R1R2.fastq
 do
   Basename=${f%_R*}
   Samplename=${Basename#*/}
-  echo humann -v --input ${Basename}_R1R2.fastq \
-  --threads 6  --remove-temp-output --bowtie-options very-sensitive-local \
+  echo humann -v --input ${Basename}_R1R2.fastq --threads 6 \
+  --bowtie-options "'-p 6 --very-sensitive-local'" \
   --nucleotide-database /projects/of33/Databases/shotgun/chocophlan \
   --protein-database /projects/of33/Databases/shotgun/uniref \
   --output humann_output/${Samplename} \
-  --metaphlan-options "--add_viruses --stat_q 0.1 --no_map --bt2_ps very-sensitive-local --min_alignment_len 100 --nproc 6 -o metaphlan_output/${Samplename}_marker_abundance_table.txt"
-  done | parallel -j 36
+  --metaphlan-options "'--add_viruses --bt2_ps very-sensitive-local --min_alignment_len 100'"
+done | parallel -j 2
 ```
 
 ### 3) Merge output tables
