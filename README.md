@@ -90,6 +90,9 @@ Note: `-j 4` is for processing 4 samples at a time. It is possible to increase i
 Although KneadData does use end-pairing information (e.g. for mapping against the host's genome), downstream tools (MetaPhlAn and HUMAnN) do not so we concatenate R1 and R2 (non-overlapping) into a single input file.
 
 ```
+# Create output directory
+mkdir kneaddata_output
+
 # Merge R1 and R2 reads 
 for f in kneaddata_output/*_kneaddata_paired_1.fastq
 do
@@ -103,6 +106,11 @@ done | parallel -j 36
 HUMAnN is a pipeline for efficiently and accurately profiling the presence/absence and abundance of microbial pathways in a community from metagenomic or metatranscriptomic sequencing data given a reference database. It automatically runs MetaPhlAn tool for profiling the composition of microbial communities from metagenomic shotgun sequencing data. MetaPhlAn relies on unique clade-specific marker genes identified from ~17,000 reference genomes (~13,500 bacterial and archaeal, ~3,500 viral, and ~110 eukaryotic).
 
 ```
+# Create output directories
+mkdir humann_output
+mkdir metaphlan_output
+
+# Run MetaPhlAn and HUMAnN
 for f in kneaddata_output/*_R1R2.fastq
 do
 Basename=${f%_R*}
