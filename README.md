@@ -122,9 +122,9 @@ do
   --threads 6  --remove-temp-output --bowtie-options very-sensitive-local \
   --nucleotide-database /projects/of33/Databases/shotgun/chocophlan \
   --protein-database /projects/of33/Databases/shotgun/uniref \
-  --metaphlan-options "--stat_q 0.1 --no_map --bt2_ps very-sensitive-local \
+  --metaphlan-options '--stat_q 0.1 --no_map --bt2_ps very-sensitive-local \
   --min_alignment_len 100 --add_viruses --nproc 6 \
-  -o metaphlan_output/${Samplename}_marker_abundance_table.txt" \
+  -o metaphlan_output/${Samplename}_marker_abundance_table.txt' \
   --output humann_output/${Samplename}
 done | parallel -j 36
 ```
