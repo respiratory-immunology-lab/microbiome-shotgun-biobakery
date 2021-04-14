@@ -54,6 +54,76 @@ kneaddata_database --download ribosomal_RNA bowtie2 path/to/databases
 
 ## Running the pipeline 
 
+The pipeline can be run using an interactive session (recommended) or by wrapping everything up into a bash script. Samples are processed in parallel using `gnu parallel` tool.
+
+```
+# Launch an interactive session
+smux n --mem 300G --ntasks=6 --cpuspertask=6 --time=3-00:00:00 -J Humann_interactive
+
+# Activate biobakery environment
+source activate biobakery3
+
+# Load gnu parallel
+module load gnuparallel
+```
+
+### 1) Quality filtering and host genetic material removal
+
+This is done using [KneadData](http://huttenhower.sph.harvard.edu/kneaddata) tool. Quality filtering includes trimming of 1) low-quality bases (default: 4-mer windows with mean Phred quality <20), 2) truncated reads (default: <50% of pre-trimmed length), and 3) adapter and barcode contaminants using `trimmomatic`. Depletion of host-derived sequences is performed by mapping with `bowtie2` against an expanded human reference genome (including known “decoy” and contaminant sequences) and optionally other hosts reference genomes and/or transcriptomes. Depletion of microbial ribosomal and structural RNAs by mapping against SILVA is also performed for metatranscriptomics.
+
+The start of the pipeline assumes you have raw, merged by sequencing lane, fastq files `[sample]_merged_R1.fastq.gz` and `[sample]_merged_R1.fastq.gz` in a directory called `rawfastq`. See [here](https://github.com/respiratory-immunology-lab/microbiome-shotgun-biobakery) for a wrapper script that includes downloading data from BaseSpace and concatenating files from different lanes.
+
+```
+# Run KneadData in parallel
+for f in rawfastq/*_R1.fastq.gz
+do
+  Basename=${f%_R*}
+  echo kneaddata -t 6 -p 6 --input ${Basename}_R1.fastq.gz --input ${Basename}_R2.fastq.gz \
+  --remove-intermediate-output --bypass-trf --output kneaddata_output \
+  --trimmomatic /home/cpat0003/miniconda3/envs/biobakery3/bin/Trimmomatic-0.33 \
+  -db /home/cpat0003/of33/Databases/shotgun/host/human/hg37dec_v0.1
+done | parallel -j 4
+```
+
+Note: `-j 4` is for processing 4 samples at a time. It is possible to increase it but it takes up an enormous amout of space. Files from contaminant genome can be deleted by running `rm -rf *contam*`.
+
+Although KneadData does use end-pairing information (e.g. for mapping against the host's genome), downstream tools (MetaPhlAn and HUMAnN) do not so we concatenate R1 and R2 (non-overlapping) into a single input file.
+
+```
+# Merge R1 and R2 reads 
+for f in kneaddata_output/*_kneaddata_paired_1.fastq
+do
+  Basename=${f%_merged*}
+  echo "ls ${Basename}*_kneaddata_paired* | xargs cat > ${Basename}_R1R2.fastq"
+done | parallel -j 36
+```
+
+### 2) Run MetaPhlAn and HUMAnN (version 3)
+
+HUMAnN is a pipeline for efficiently and accurately profiling the presence/absence and abundance of microbial pathways in a community from metagenomic or metatranscriptomic sequencing data given a reference database. It automatically runs MetaPhlAn tool for profiling the composition of microbial communities from metagenomic shotgun sequencing data. MetaPhlAn relies on unique clade-specific marker genes identified from ~17,000 reference genomes (~13,500 bacterial and archaeal, ~3,500 viral, and ~110 eukaryotic).
+
+```
+for f in kneaddata_output/*_R1R2.fastq
+do
+Basename=${f%_R*}
+Samplename=${Basename#*/}
+echo humann -v --input ${Basename}_R1R2.fastq \
+--threads 6  --remove-temp-output --bowtie-options very-sensitive-local \
+--nucleotide-database /projects/of33/Databases/shotgun/chocophlan \
+--protein-database /projects/of33/Databases/shotgun/uniref \
+--metaphlan-options "--stat_q 0.1 --no_map --bt2_ps very-sensitive-local \
+--min_alignment_len 100 --add_viruses --nproc 6 \
+-o metaphlan_output/${Samplename}_marker_abundance_table.txt" \
+--output humann_output/${Samplename}
+done | parallel -j 36
+```
+
+### 3) Merge output tables
+
+### 1) 
+
+### 1) 
+
 ### 1) 
 
 
