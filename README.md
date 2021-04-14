@@ -54,11 +54,14 @@ kneaddata_database --download ribosomal_RNA bowtie2 path/to/databases
 
 ## Running the pipeline 
 
-The pipeline can be run using an interactive session (recommended) or by wrapping everything up into a bash script. Samples are processed in parallel using `gnu parallel` tool.
+The pipeline can be run using an interactive session or by wrapping everything up into bash scripts (provided [here](https://github.com/respiratory-immunology-lab/microbiome-shotgun-biobakery/edit/main/README.md)). Samples are processed in parallel using `gnu parallel` tool.
 
 ```
 # Launch an interactive session
 smux n --mem 300G --ntasks=6 --cpuspertask=6 --time=3-00:00:00 -J Humann_interactive
+
+# OR
+sbatch [script].sh
 
 # Activate biobakery environment
 source activate biobakery3
@@ -113,27 +116,43 @@ mkdir metaphlan_output
 # Run MetaPhlAn and HUMAnN
 for f in kneaddata_output/*_R1R2.fastq
 do
-Basename=${f%_R*}
-Samplename=${Basename#*/}
-echo humann -v --input ${Basename}_R1R2.fastq \
---threads 6  --remove-temp-output --bowtie-options very-sensitive-local \
---nucleotide-database /projects/of33/Databases/shotgun/chocophlan \
---protein-database /projects/of33/Databases/shotgun/uniref \
---metaphlan-options "--stat_q 0.1 --no_map --bt2_ps very-sensitive-local \
---min_alignment_len 100 --add_viruses --nproc 6 \
--o metaphlan_output/${Samplename}_marker_abundance_table.txt" \
---output humann_output/${Samplename}
+  Basename=${f%_R*}
+  Samplename=${Basename#*/}
+  echo humann -v --input ${Basename}_R1R2.fastq \
+  --threads 6  --remove-temp-output --bowtie-options very-sensitive-local \
+  --nucleotide-database /projects/of33/Databases/shotgun/chocophlan \
+  --protein-database /projects/of33/Databases/shotgun/uniref \
+  --metaphlan-options "--stat_q 0.1 --no_map --bt2_ps very-sensitive-local \
+  --min_alignment_len 100 --add_viruses --nproc 6 \
+  -o metaphlan_output/${Samplename}_marker_abundance_table.txt" \
+  --output humann_output/${Samplename}
 done | parallel -j 36
 ```
 
 ### 3) Merge output tables
 
-### 1) 
+```
+# Merge taxonomic tables
+merge_metaphlan_tables.py metaphlan_output/*_marker_abundance_table.txt > all_samples_marker_abundance_table.txt
 
-### 1) 
+# Merge all tables
+humann_join_tables -i PathCoverage -o merged_pathcoverage.tsv --file_name pathcoverage
+humann_join_tables -i Pathways -o merged_pathabundance.tsv --file_name pathabundance
+humann_join_tables -i GeneFamilies -o merged_genefamilies.tsv --file_name genefamilies
 
-### 1) 
+# Normalise gene families abundances
+humann_renorm_table -i merged_genefamilies.tsv -o merged_genefamilies_cpm.tsv --units cpm
 
+# Add names to Uniref IDs
+humann_rename_table --input merged_genefamilies_cpm.tsv --custom /home/cpat0003/of33_scratch/Shotgun/db/utility_mapping/map_uniref90_name.txt.gz --output merged_genefamilies_cpm_uniref90_name.tsv
+
+# Regroup gene families
+humann_regroup_table --input merged_genefamilies_cpm.tsv --output merged_genefamilies_cpm_uniref90_rxn_grouped.tsv -g uniref90_rxn
+
+humann_regroup_table --input merged_genefamilies_cpm.tsv --output merged_genefamilies_cpm_uniref90_go_grouped.tsv -g uniref90_go
+
+humann_regroup_table --input merged_genefamilies_cpm.tsv --output merged_genefamilies_cpm_uniref90_level4ec_grouped.tsv -g uniref90_level4ec
+```
 
 ## Citation
 
