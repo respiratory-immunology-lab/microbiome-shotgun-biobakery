@@ -130,13 +130,13 @@ done | parallel -j 2
 ### 3) Merge output tables
 
 ```
-# Merge taxonomic tables
-merge_metaphlan_tables.py metaphlan_output/*_marker_abundance_table.txt > all_samples_marker_abundance_table.txt
+# Merge metaphlan tables
+find humann_output -name "*bugs_list.tsv" | xargs merge_metaphlan_tables.py -o metaphlan_all_samples.txt
 
-# Merge all tables
-humann_join_tables -i PathCoverage -o merged_pathcoverage.tsv --file_name pathcoverage
-humann_join_tables -i Pathways -o merged_pathabundance.tsv --file_name pathabundance
-humann_join_tables -i GeneFamilies -o merged_genefamilies.tsv --file_name genefamilies
+# Merge humann tables
+humann_join_tables -i humann_output -s -o pathcoverage_all_samples.tsv --file_name pathcoverage
+humann_join_tables -i humann_output -s -o pathabundance_all_samples.tsv --file_name pathabundance
+humann_join_tables -i humann_output -s -o genefamilies_all_samples.tsv --file_name genefamilies
 
 # Normalise gene families abundances
 humann_renorm_table -i merged_genefamilies.tsv -o merged_genefamilies_cpm.tsv --units cpm
