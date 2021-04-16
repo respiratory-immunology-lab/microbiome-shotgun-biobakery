@@ -138,18 +138,16 @@ humann_join_tables -i humann_output -s -o pathcoverage_all_samples.tsv --file_na
 humann_join_tables -i humann_output -s -o pathabundance_all_samples.tsv --file_name pathabundance
 humann_join_tables -i humann_output -s -o genefamilies_all_samples.tsv --file_name genefamilies
 
-# Normalise gene families abundances
-humann_renorm_table -i merged_genefamilies.tsv -o merged_genefamilies_cpm.tsv --units cpm
+# Normalise gene families abundances and ignore special features UNMAPPED, UNINTEGRATED, and UNGROUPED
+humann_renorm_table -i genefamilies_all_samples.tsv -o genefamilies_all_samples_CoPM.tsv -s n --units cpm
 
 # Add names to Uniref IDs
-humann_rename_table --input merged_genefamilies_cpm.tsv --custom /home/cpat0003/of33_scratch/Shotgun/db/utility_mapping/map_uniref90_name.txt.gz --output merged_genefamilies_cpm_uniref90_name.tsv
+humann_rename_table --input genefamilies_all_samples_CoPM.tsv -c ~/of33/Databases/shotgun/utility_mapping/map_uniref90_name.txt.gz --output genefamilies_all_samples_uniref90_name_CoPM.tsv
 
 # Regroup gene families
-humann_regroup_table --input merged_genefamilies_cpm.tsv --output merged_genefamilies_cpm_uniref90_rxn_grouped.tsv -g uniref90_rxn
-
-humann_regroup_table --input merged_genefamilies_cpm.tsv --output merged_genefamilies_cpm_uniref90_go_grouped.tsv -g uniref90_go
-
-humann_regroup_table --input merged_genefamilies_cpm.tsv --output merged_genefamilies_cpm_uniref90_level4ec_grouped.tsv -g uniref90_level4ec
+humann_regroup_table --input genefamilies_all_samples_CoPM.tsv --output genefamilies_all_samples_CoPM_rxn.tsv -g uniref90_rxn
+humann_regroup_table --input genefamilies_all_samples_CoPM.tsv --output genefamilies_all_samples_CoPM_go.tsv -g uniref90_go
+humann_regroup_table --input genefamilies_all_samples_CoPM.tsv --output genefamilies_all_samples_CoPM_level4ec.tsv -g uniref90_level4ec
 ```
 
 ## Citation
