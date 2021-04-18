@@ -111,7 +111,6 @@ HUMAnN is a pipeline for efficiently and accurately profiling the presence/absen
 ```
 # Create output directories
 mkdir humann_output
-mkdir metaphlan_output
 
 # Run MetaPhlAn and HUMAnN
 for f in kneaddata_output/*_R1R2.fastq
@@ -124,7 +123,7 @@ do
   --protein-database /projects/of33/Databases/shotgun/uniref \
   --output humann_output/${Samplename} \
   --metaphlan-options "'--add_viruses --bt2_ps very-sensitive-local --min_alignment_len 100'"
-done | parallel -j 2
+done | parallel -j 6
 ```
 
 ### 3) Merge output tables
