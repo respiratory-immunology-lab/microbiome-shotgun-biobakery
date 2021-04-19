@@ -58,9 +58,9 @@ The pipeline can be run using an interactive session or by wrapping everything u
 
 ```
 # Launch an interactive session
-smux n --mem 300G --ntasks=6 --cpuspertask=6 --time=3-00:00:00 -J Humann_interactive
+smux n --mem 200G --ntasks=36 --time=3-00:00:00 -J Humann_interactive
 
-# OR
+# OR RECOMMENDED
 sbatch [script].sh
 
 # Activate biobakery environment
