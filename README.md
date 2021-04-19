@@ -86,6 +86,16 @@ do
   --trimmomatic /home/cpat0003/miniconda3/envs/biobakery3/bin/Trimmomatic-0.33 \
   -db /home/cpat0003/of33/Databases/shotgun/host/human/hg37dec_v0.1
 done | parallel -j 4
+
+# Extract human and non human reads numbers from log files
+for f in kneaddata_output/*.log
+do
+  Basename=${f%_merged*}
+  Samplename=${Basename#*/}
+  Human=$(sed -n 's/hg37dec_v0.1_bowtie2_paired_contam_1.fastq\(.*\).0/\1/p' $f | sed 's/.*: //')
+  Microbial=$(sed -n 's/R1_kneaddata_paired_1.fastq\(.*\).0/\1/p' $f | sed 's/.*: //')
+  echo $Samplename $Human $Microbial
+done > read_counts.txt
 ```
 
 Note: `-j 4` is for processing 4 samples at a time. It is possible to increase it but it takes up an enormous amout of space. Files from contaminant genome can be deleted by running `rm -rf *contam*`.
