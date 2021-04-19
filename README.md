@@ -147,16 +147,32 @@ humann_join_tables -i humann_output -s -o pathcoverage_all_samples.tsv --file_na
 humann_join_tables -i humann_output -s -o pathabundance_all_samples.tsv --file_name pathabundance
 humann_join_tables -i humann_output -s -o genefamilies_all_samples.tsv --file_name genefamilies
 
-# Normalise gene families abundances and ignore special features UNMAPPED, UNINTEGRATED, and UNGROUPED
-humann_renorm_table -i genefamilies_all_samples.tsv -o genefamilies_all_samples_CoPM.tsv -s n --units cpm
-
 # Add names to Uniref IDs
-humann_rename_table --input genefamilies_all_samples_CoPM.tsv -c ~/of33/Databases/shotgun/utility_mapping/map_uniref90_name.txt.gz --output genefamilies_all_samples_uniref90_name_CoPM.tsv
+humann_rename_table -i genefamilies_all_samples.tsv -c ~/of33/Databases/shotgun/utility_mapping/map_uniref90_name.txt -o genefamilies_all_samples_uniref_names.tsv
 
-# Regroup gene families
-humann_regroup_table --input genefamilies_all_samples_CoPM.tsv --output genefamilies_all_samples_CoPM_rxn.tsv -g uniref90_rxn
-humann_regroup_table --input genefamilies_all_samples_CoPM.tsv --output genefamilies_all_samples_CoPM_go.tsv -g uniref90_go
-humann_regroup_table --input genefamilies_all_samples_CoPM.tsv --output genefamilies_all_samples_CoPM_level4ec.tsv -g uniref90_level4ec
+# Split tables into stratified and unstratified
+humann_split_stratified_table -i genefamilies_all_samples_uniref_names.tsv -o .
+humann_split_stratified_table -i pathabundance_all_samples.tsv -o .
+humann_split_stratified_table -i pathcoverage_all_samples.tsv -o .
+```
+
+Optional: Map the uniref90 IDs to KEGG or GO IDs.
+
+```
+# Regroup into KEGG IDs and add names
+humann_regroup_table -i genefamilies_all_samples.tsv --output genefamilies_all_samples_KO.tsv -c ~/of33/Databases/shotgun/utility_mapping/map_ko_uniref90.txt
+humann_rename_table -i genefamilies_all_samples_KO.tsv -c ~/of33/Databases/shotgun/utility_mapping/map_ko_name.txt -o genefamilies_all_samples_KO_names.tsv
+
+# Regroup into GO IDs and add names
+humann_regroup_table -i genefamilies_all_samples.tsv --output genefamilies_all_samples_GO.tsv -c ~/of33/Databases/shotgun/utility_mapping/map_go_uniref90.txt
+humann_rename_table -i genefamilies_all_samples_GO.tsv -c ~/of33/Databases/shotgun/utility_mapping/map_go_name.txt -o genefamilies_all_samples_GO_names.tsv
+```
+
+Optional: Perform normalisation (can also be done downstream in R).
+
+```
+# Normalise gene families and pathways abundances and ignore special features UNMAPPED, UNINTEGRATED, and UNGROUPED
+humann_renorm_table -i genefamilies_all_samples.tsv -o genefamilies_all_samples_uniref_CoPM.tsv -s n --units cpm
 ```
 
 ## Citation
