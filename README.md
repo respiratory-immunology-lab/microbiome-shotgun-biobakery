@@ -140,7 +140,7 @@ done | parallel -j 6
 
 ```
 # Merge metaphlan tables
-find humann_output -name "*bugs_list.tsv" | xargs merge_metaphlan_tables.py -o metaphlan_all_samples.txt
+find humann_output -name "*bugs_list.tsv" | xargs merge_metaphlan_tables.py -o metaphlan_all_samples.tsv
 
 # Merge humann tables
 humann_join_tables -i humann_output -s -o pathcoverage_all_samples.tsv --file_name pathcoverage
