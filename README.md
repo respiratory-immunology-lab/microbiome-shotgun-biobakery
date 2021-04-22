@@ -90,6 +90,9 @@ do
   -db /home/cpat0003/of33/Databases/shotgun/host/human/hg37dec_v0.1
 done | parallel -j 4
 
+# Remove contaminant files to increase space
+rm -rf *contam*	
+
 # Extract human and non human reads numbers from log files
 for f in kneaddata_output/*.log
 do
