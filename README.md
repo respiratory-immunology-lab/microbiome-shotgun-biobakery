@@ -77,6 +77,9 @@ This is done using [KneadData](http://huttenhower.sph.harvard.edu/kneaddata) too
 The start of the pipeline assumes you have raw, merged by sequencing lane, fastq files `[sample]_merged_R1.fastq.gz` and `[sample]_merged_R1.fastq.gz` in a directory called `rawfastq`. See [here](https://github.com/respiratory-immunology-lab/microbiome-shotgun/blob/master/fastq_wrapper.sh) for a wrapper script that includes downloading data from BaseSpace and concatenating files from different lanes.
 
 ```
+# Create output directory
+mkdir kneaddata_output
+
 # Run KneadData in parallel
 for f in rawfastq/*_R1.fastq.gz
 do
@@ -103,9 +106,6 @@ Note: `-j 4` is for processing 4 samples at a time. It is possible to increase i
 Although KneadData does use end-pairing information (e.g. for mapping against the host's genome), downstream tools (MetaPhlAn and HUMAnN) do not so we concatenate R1 and R2 (non-overlapping) into a single input file.
 
 ```
-# Create output directory
-mkdir kneaddata_output
-
 # Merge R1 and R2 reads 
 for f in kneaddata_output/*_kneaddata_paired_1.fastq
 do
