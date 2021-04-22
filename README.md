@@ -74,7 +74,7 @@ module load gnuparallel
 
 This is done using [KneadData](http://huttenhower.sph.harvard.edu/kneaddata) tool. Quality filtering includes trimming of 1) low-quality bases (default: 4-mer windows with mean Phred quality <20), 2) truncated reads (default: <50% of pre-trimmed length), and 3) adapter and barcode contaminants using `trimmomatic`. Depletion of host-derived sequences is performed by mapping with `bowtie2` against an expanded human reference genome (including known “decoy” and contaminant sequences) and optionally other hosts reference genomes and/or transcriptomes. Depletion of microbial ribosomal and structural RNAs by mapping against SILVA is also performed for metatranscriptomics.
 
-The start of the pipeline assumes you have raw, merged by sequencing lane, fastq files `[sample]_merged_R1.fastq.gz` and `[sample]_merged_R1.fastq.gz` in a directory called `rawfastq`. See [here](https://github.com/respiratory-immunology-lab/microbiome-shotgun-biobakery) for a wrapper script that includes downloading data from BaseSpace and concatenating files from different lanes.
+The start of the pipeline assumes you have raw, merged by sequencing lane, fastq files `[sample]_merged_R1.fastq.gz` and `[sample]_merged_R1.fastq.gz` in a directory called `rawfastq`. See [here](https://github.com/respiratory-immunology-lab/microbiome-shotgun/blob/master/fastq_wrapper.sh) for a wrapper script that includes downloading data from BaseSpace and concatenating files from different lanes.
 
 ```
 # Run KneadData in parallel
