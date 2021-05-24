@@ -52,6 +52,13 @@ kneaddata_database --download human_transcriptome bowtie2 /path/to/databases
 kneaddata_database --download ribosomal_RNA bowtie2 path/to/databases
 ```
 
+The newer updates to the HUMAnN databases used in v3.0 may require a newer version of `diamond` than is automatically required (hopefully this will be rectified in future updates). If you get an error message when running the code in section 2 below, then you can manually update your version of diamond using the code below.
+
+```
+# Download diamond v0.9.36
+conda install -c bioconda diamond=0.9.36
+```
+
 ## Running the pipeline 
 
 The pipeline can be run using an interactive session or by wrapping everything up into bash scripts (provided [here](https://github.com/respiratory-immunology-lab/microbiome-shotgun-biobakery/edit/main/README.md)). Samples are processed in parallel using `gnu parallel` tool.
