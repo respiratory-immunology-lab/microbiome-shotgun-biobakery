@@ -28,6 +28,18 @@ pip install kneaddata
 ```
 If there is an issue with `trimmomatic` error message, check this issue: https://github.com/bioconda/bioconda-recipes/issues/18666 and re-install binaries.
 
+As of May 2021, this issue still persists. Therefore, use the following steps based on the link above. You will then use this new path as the location of Trimmomatic in section 1 (kneaddata steps).
+
+```
+# Navigate to a folder where you want to install Trimmomatic (e.g. ~/of33/share) - create folder if necessary (via mkdir function)
+# The location for --trimmomatic in section 1 will in this case be: "/home/USERNAME/of33/share/Trimmomatic-0.33"
+cd ~/of33/share
+
+# Download the Trimmomatic .zip file and unzip it
+curl -o Trimmomatic-0.33.zip http://www.usadellab.org/cms/uploads/supplementary/Trimmomatic/Trimmomatic-0.33.zip
+unzip Trimmomatic-0.33.zip
+```
+
 ## Installation of databases
 
 The latest databases are **already downloaded** on the cluster and located under `of33/Databases/shotgun`. You might need to specifiy the full path when launching one of the pipelines.
@@ -52,7 +64,7 @@ kneaddata_database --download human_transcriptome bowtie2 /path/to/databases
 kneaddata_database --download ribosomal_RNA bowtie2 path/to/databases
 ```
 
-The newer updates to the HUMAnN databases used in v3.0 may require a newer version of `diamond` than is automatically required (hopefully this will be rectified in future updates). If you get an error message when running the code in section 2 below, then you can manually update your version of diamond using the code below.
+The newer updates to the HUMAnN databases used in v3.0 may require a newer version of `diamond` than is automatically installed (hopefully this will be rectified in future updates). If you get an error message when running the code in section 2 below, then you can manually update your version of diamond using the code below.
 
 ```
 # Download diamond v0.9.36
@@ -82,6 +94,10 @@ module load gnuparallel
 This is done using [KneadData](http://huttenhower.sph.harvard.edu/kneaddata) tool. Quality filtering includes trimming of 1) low-quality bases (default: 4-mer windows with mean Phred quality <20), 2) truncated reads (default: <50% of pre-trimmed length), and 3) adapter and barcode contaminants using `trimmomatic`. Depletion of host-derived sequences is performed by mapping with `bowtie2` against an expanded human reference genome (including known “decoy” and contaminant sequences) and optionally other hosts reference genomes and/or transcriptomes. Depletion of microbial ribosomal and structural RNAs by mapping against SILVA is also performed for metatranscriptomics.
 
 The start of the pipeline assumes you have raw, merged by sequencing lane, fastq files `[sample]_merged_R1.fastq.gz` and `[sample]_merged_R1.fastq.gz` in a directory called `rawfastq`. See [here](https://github.com/respiratory-immunology-lab/microbiome-shotgun/blob/master/fastq_wrapper.sh) for a wrapper script that includes downloading data from BaseSpace and concatenating files from different lanes.
+
+If you only have data from a single lane, then you are not required to merge files, and will therefore not have renamed files ending in `_merged_R1.fastq.gz`. 
+In this case, for the first `for` loop (run kneaddata in parallel), change instances of `_R1` and `_R2` to `_R1_001` and `_R2_001` respectively; you do not need to change `_R` during `Basename` assignment however.
+For the second `for` loop (extract human and non-human reads numbers from log files), in the `Basename` assignment, change `_merged` to `_R1_001`. Then, for the assignment of the `Microbial` variable, replace `R1` with `R1_001`.
 
 ```
 # Create output directory
