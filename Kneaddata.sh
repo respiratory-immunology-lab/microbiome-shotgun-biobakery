@@ -20,5 +20,5 @@ do
   echo kneaddata -t 8 -p 4 --input ${Basename}_R1.fastq.gz --input ${Basename}_R2.fastq.gz \
   --remove-intermediate-output --bypass-trf --output kneaddata_output \
   --trimmomatic /home/cpat0003/miniconda3/envs/biobakery3/bin/Trimmomatic-0.33 \
-  -db /home/cpat0003/of33/Databases/shotgun/host/human/hg37dec_v0.1
+  -db /home/cpat0003/of33/Databases/shotgun/host/human/kneaddata/hg37dec_v0.1
 done | parallel
