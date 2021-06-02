@@ -95,6 +95,8 @@ This is done using [KneadData](http://huttenhower.sph.harvard.edu/kneaddata) too
 
 The start of the pipeline assumes you have raw, merged by sequencing lane, fastq files `[sample]_merged_R1.fastq.gz` and `[sample]_merged_R1.fastq.gz` in a directory called `rawfastq`. See [here](https://github.com/respiratory-immunology-lab/microbiome-shotgun/blob/master/fastq_wrapper.sh) for a wrapper script that includes downloading data from BaseSpace and concatenating files from different lanes.
 
+If your files are on Google Drive, you can view the `README.md` file in the `transfer_files` folder above for instructions on using `rclone` to transfer your files over to the cluster.
+
 If you only have data from a single lane, then you are not required to merge files, and will therefore not have renamed files ending in `_merged_R1.fastq.gz`. 
 In this case, for the first `for` loop (run kneaddata in parallel), change instances of `_R1` and `_R2` to `_R1_001` and `_R2_001` respectively; you do not need to change `_R` during `Basename` assignment however.
 For the second `for` loop (extract human and non-human reads numbers from log files), in the `Basename` assignment, change `_merged` to `_R1_001`. Then, for the assignment of the `Microbial` variable, replace `R1` with `R1_001`.
