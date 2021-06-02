@@ -140,6 +140,17 @@ do
 done | parallel -j 36
 ```
 
+If you are processing data from a single lane, the corresponding merge can be achieved as follows, by replacing the `f%_merged*` with `f%_R1_001`.
+
+```bash
+# Merge R1 and R2 reads
+for f in kneaddata_output/*_kneaddata_paired_1.fastq
+do
+  Basename=${f%_R1_001*}
+  echo "ls ${Basename}*_kneaddata_paired* | xargs cat > ${Basename}_R1R2.fastq"
+done | parallel -j 36
+```
+
 ### 2) Run MetaPhlAn and HUMAnN (version 3)
 
 HUMAnN is a pipeline for efficiently and accurately profiling the presence/absence and abundance of microbial pathways in a community from metagenomic or metatranscriptomic sequencing data given a reference database. It automatically runs MetaPhlAn tool for profiling the composition of microbial communities from metagenomic shotgun sequencing data. MetaPhlAn relies on unique clade-specific marker genes identified from ~17,000 reference genomes (~13,500 bacterial and archaeal, ~3,500 viral, and ~110 eukaryotic).
