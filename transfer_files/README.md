@@ -11,6 +11,9 @@ First, you need to install `rsync` and `rclone` inside you BioBakery3 conda envi
 This should have been set up previously, and contain all your other tools for shotgun data analysis.
 
 ```bash
+# Activate the biobakery3 environment
+conda activate biobakery3
+
 # Install rsync and rclone via conda
 conda install rsync rclone
 ```
