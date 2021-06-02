@@ -7,7 +7,7 @@ This pipeline is based on [Biobakery](https://github.com/biobakery/biobakery) to
 
 MetaPhlAn (taxonomic profiling) and HUManN (functional profiling) will be installed along with KneadData (QC and host removal).
 
-```
+```bash
 # Create a conda environment
 conda create --name biobakery3 python=3.7
 
@@ -30,7 +30,7 @@ If there is an issue with `trimmomatic` error message, check this issue: https:/
 
 As of May 2021, this issue still persists. Therefore, use the following steps based on the link above. You will then use this new path as the location of Trimmomatic in section 1 (kneaddata steps).
 
-```
+```bash
 # Navigate to a folder where you want to install Trimmomatic (e.g. ~/of33/share) - create folder if necessary (via mkdir function)
 # The location for --trimmomatic in section 1 will in this case be: "/home/USERNAME/of33/share/Trimmomatic-0.33"
 cd ~/of33/share
@@ -44,7 +44,7 @@ unzip Trimmomatic-0.33.zip
 
 The latest databases are **already downloaded** on the cluster and located under `of33/Databases/shotgun`. You might need to specifiy the full path when launching one of the pipelines.
 
-```
+```bash
 # Download pangenome database
 humann_databases --download chocophlan full /path/to/databases --update-config yes --index latest
 
@@ -66,7 +66,7 @@ kneaddata_database --download ribosomal_RNA bowtie2 path/to/databases
 
 The newer updates to the HUMAnN databases used in v3.0 may require a newer version of `diamond` than is automatically installed (hopefully this will be rectified in future updates). If you get an error message when running the code in section 2 below, then you can manually update your version of diamond using the code below.
 
-```
+```bash
 # Download diamond v0.9.36
 conda install -c bioconda diamond=0.9.36
 ```
@@ -75,7 +75,7 @@ conda install -c bioconda diamond=0.9.36
 
 The pipeline can be run using an interactive session or by wrapping everything up into bash scripts (provided [here](https://github.com/respiratory-immunology-lab/microbiome-shotgun-biobakery/edit/main/README.md)). Samples are processed in parallel using `gnu parallel` tool.
 
-```
+```bash
 # Launch an interactive session
 smux n --mem 200G --ntasks=36 --time=3-00:00:00 -J Humann_interactive
 
@@ -99,7 +99,7 @@ If you only have data from a single lane, then you are not required to merge fil
 In this case, for the first `for` loop (run kneaddata in parallel), change instances of `_R1` and `_R2` to `_R1_001` and `_R2_001` respectively; you do not need to change `_R` during `Basename` assignment however.
 For the second `for` loop (extract human and non-human reads numbers from log files), in the `Basename` assignment, change `_merged` to `_R1_001`. Then, for the assignment of the `Microbial` variable, replace `R1` with `R1_001`.
 
-```
+```bash
 # Create output directory
 mkdir kneaddata_output
 
@@ -131,7 +131,7 @@ Note: `-j 4` is for processing 4 samples at a time. It is possible to increase i
 
 Although KneadData does use end-pairing information (e.g. for mapping against the host's genome), downstream tools (MetaPhlAn and HUMAnN) do not so we concatenate R1 and R2 (non-overlapping) into a single input file.
 
-```
+```bash
 # Merge R1 and R2 reads 
 for f in kneaddata_output/*_kneaddata_paired_1.fastq
 do
@@ -144,7 +144,7 @@ done | parallel -j 36
 
 HUMAnN is a pipeline for efficiently and accurately profiling the presence/absence and abundance of microbial pathways in a community from metagenomic or metatranscriptomic sequencing data given a reference database. It automatically runs MetaPhlAn tool for profiling the composition of microbial communities from metagenomic shotgun sequencing data. MetaPhlAn relies on unique clade-specific marker genes identified from ~17,000 reference genomes (~13,500 bacterial and archaeal, ~3,500 viral, and ~110 eukaryotic).
 
-```
+```bash
 # Create output directories
 mkdir humann_output
 
@@ -162,9 +162,41 @@ do
 done | parallel -j 6
 ```
 
+#### Error: most reads remain unknown and unassigned
+
+You may encounter an error where no bacteria are being assigned in your `metaphlan_bugs_list.tsv` file (located in the `_temp` folder within the sample output folder in `humann_output`). 
+If this is the case, you may need to manually download and direct `humann` to the correct database for `metaphlan` analysis.
+You can do this as follows:
+
+```bash
+# Create a folder to store the MetaPhlAn database (it doesn't matter where)
+mkdir metaphlan_db
+cd metaphlan_db
+
+# Install the database within this folder
+metaphlan --install --index mpa_v30_CHOCOPhlAn_201901 --bowtie2db .
+```
+
+Then, in the call to humann, under the `--metaphlan-options` flag, add the `--bowtie2db` flag and direct MetaPhlAn to the correct database to use.
+
+```bash
+# Run MetaPhlAn and HUMAnN
+for f in kneaddata_output/*_R1R2.fastq
+do
+Basename=${f%_R*}
+  Samplename=${Basename#*/}
+  echo humann -v --input ${Basename}_R1R2.fastq --threads 6 \
+  --bowtie-options "'-p 6'" \
+  --nucleotide-database /projects/of33/Databases/shotgun/chocophlan \
+  --protein-database /projects/of33/Databases/shotgun/uniref \
+  --output humann_output/${Samplename} \
+  --metaphlan-options "'--bowtie2db path/to/metaphlan_db --min_alignment_len 100'"
+done | parallel -j 6
+```
+
 ### 3) Merge output tables
 
-```
+```bash
 # Merge metaphlan tables
 find humann_output -name "*bugs_list.tsv" | xargs merge_metaphlan_tables.py -o metaphlan_all_samples.tsv
 
@@ -184,7 +216,7 @@ humann_split_stratified_table -i pathcoverage_all_samples.tsv -o .
 
 Optional: Map the uniref90 IDs to KEGG or GO IDs.
 
-```
+```bash
 # Regroup into KEGG IDs and add names
 humann_regroup_table -i genefamilies_all_samples.tsv --output genefamilies_all_samples_KO.tsv -c ~/of33/Databases/shotgun/utility_mapping/map_ko_uniref90.txt
 humann_rename_table -i genefamilies_all_samples_KO.tsv -c ~/of33/Databases/shotgun/utility_mapping/map_ko_name.txt -o genefamilies_all_samples_KO_names.tsv
@@ -196,7 +228,7 @@ humann_rename_table -i genefamilies_all_samples_GO.tsv -c ~/of33/Databases/shotg
 
 Optional: Perform normalisation (can also be done downstream in R).
 
-```
+```bash
 # Normalise gene families and pathways abundances and ignore special features UNMAPPED, UNINTEGRATED, and UNGROUPED
 humann_renorm_table -i genefamilies_all_samples.tsv -o genefamilies_all_samples_uniref_CoPM.tsv -s n --units cpm
 ```
