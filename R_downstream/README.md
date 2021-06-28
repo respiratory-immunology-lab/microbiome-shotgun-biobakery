@@ -1,6 +1,6 @@
 # Downstream analysis in R
 
-### PCoA
+## PCoA
 
 Here we can use the functions provided in the `custom_PCoA.R` file to generate PCoA data and plot the resulting information.
 
@@ -35,7 +35,7 @@ The output plot for the code above looks like this:
 <img src="https://github.com/mmac0026/microbiome-shotgun-biobakery/blob/main/R_downstream/assets/genefam_PCoA_timeframe.png" width="595" height="525">
 
 
-### Differential abundance testing with MaAsLin2
+## Differential abundance testing with MaAsLin2
 
 The `MaAsLin2` package for R is an extremely useful package for differential abundance testing. 
 
@@ -48,7 +48,7 @@ The input requires two data.frames:
 
 Importantly, the column names of `input_data` must match the rownames of `input_metadata` (a requirement for `MaAsLin2`.
 
-##### Formatting names
+#### Formatting names
 
 If you are working with Gene Family data output from `HUMAnN` with KEGG Orthology names, there is an option in the custom function to process the standard 'Gene Family' names provided by `HUMAnN` into something that will look better when graphed (shorter, and without the KO and EC identifiers). These names will look something like: K00001: alcohol dehydrogenase [EC:1.1.1.1] or K00241: succinate dehydrogenase / fumarate reductase, cytochrome b subunit (the latter lacks the EC identifier). The `handle_humann_KO` argument handles both of these cases, and creates new columns in the fit results data.frame for `kegg_id`, `kegg_description`, and `ec_id` (where available).
 
@@ -56,7 +56,7 @@ In the example genes above, the `kegg_description` values would be "alcohol dehy
 
 There will be a similar option coming that will allow processing of the standard HUMAnN pathway abundance/coverage names and gene names of UniRef90 origin (yet to be added).
 
-#### Running the function and looking at the output
+### Running the function and looking at the output
 
 Running the function is very similar to running `maaslin2()`, however some of the additional arguments are set by default, including the `min_abundance`, `min_prevalence`, `normalization` and `transform` arguments. These can however all be modified as needed within the call to the `custom_Maaslin2()` function.
 
