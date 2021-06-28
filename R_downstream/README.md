@@ -76,3 +76,4 @@ You can then view the fit results (for the example) using `genefamilies_KO_maasl
 
 The plot for the above example looks like this:
 
+<img src="https://github.com/mmac0026/microbiome-shotgun-biobakery/blob/main/R_downstream/assets/genefamilies_KO_unstrat_maaslin_plotc.png" width="700" height="420">
