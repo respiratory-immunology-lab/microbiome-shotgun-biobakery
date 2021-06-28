@@ -33,7 +33,6 @@ custom_Maaslin2 <- function(input_data, input_metadata, fixed_effects = '', rand
     kegg_names_df$ec_id <- ifelse(str_detect(kegg_names_df$kegg_name, '\\['),
                                   gsub('.*\\[EC\\:(.*)\\]', '\\1', kegg_names_df$kegg_name),
                                   NA)
-    kegg_names_df$kegg_name <- NULL
     
     # Add the nicer descriptions to the fit_res table
     fit_res <- fit_res %>%
