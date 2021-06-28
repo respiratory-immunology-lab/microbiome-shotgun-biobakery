@@ -77,3 +77,36 @@ You can then view the fit results (for the example) using `genefamilies_KO_maasl
 The plot for the above example looks like this:
 
 <img src="https://github.com/mmac0026/microbiome-shotgun-biobakery/blob/main/R_downstream/assets/genefamilies_KO_unstrat_maaslin_plot.png" width="700" height="420">
+
+### Plotting individual plots from raw values to check MaAsLin2 significant results
+
+We should now plot the raw values to confirm that a few values are not skewing the mean and influencing the MaAsLin2 results.
+
+To do this, we can use the code in the `custom_Maaslin2_VarPlots.R` file. It will save the arranged individual plots as a .pdf file (2 per page) to the output file specified when calling the function `custom_Maaslin2_VarPlots()`.
+
+When calling the function, you need to input the same `input_data` and `input_metadata` object as for the `custom_Maaslin2()` function, along with the output from the `custom_Maaslin2()` function. 
+
+Additionally, you need to specify:
+
+- `output`: the file path of the .pdf file to be saved by the function.
+- `x_factor`: the factor variable to be used in plotting (this will be the same as your MaAsLin2 fixed effect above).
+- `x_label`: a nice, reader-friendly version of the `x_factor` to be used in the legend.
+
+An example of running the code is as follows:
+
+```r
+# Plot the individual variables with raw values
+genefamilies_KO_unstrat_indivplots <- custom_Maaslin2_VarPlots(input_data = input_data, 
+                                                               input_metadata = input_metadata,
+                                                               custom_Maaslin2 = genefamilies_KO_maaslin,
+                                                               output = here::here('output', 'maaslin2', 'genefamilies_KO_unstrat', 
+                                                                                   'genefamilies_KO_unstrat_indiv_plots.pdf'),
+                                                               x_factor = 'timeframe',
+                                                               x_label = 'Time Frame')
+```
+
+This will assign the multi-page plot to the `genefamilies_KO_unstrat_indivplots` object, and save the multi-page plot to the specified output directory.
+
+In the example above, the first page of the .pdf file looks like this:
+
+<img src="https://github.com/mmac0026/microbiome-shotgun-biobakery/blob/main/R_downstream/assets/genefamilies_KO_unstrat_indivplot1.png" width="700" height="700">
