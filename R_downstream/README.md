@@ -33,3 +33,37 @@ The second part of the code will return a `ggplot` graph object.
 The output plot for the code above looks like this:
 
 <img src="https://github.com/mmac0026/microbiome-shotgun-biobakery/blob/main/R_downstream/assets/genefam_PCoA_timeframe.png" width="595" height="525">
+
+
+### Differential abundance testing with MaAsLin2
+
+The `MaAsLin2` package for R is an extremely useful package for differential abundance testing. 
+
+Here we can use the custom function call in the `custom_Maaslin2.R` file to quickly process the data and produce a graph of the significant features. The fit results and the graph are stored in a list object, and can be accessed accordingly.
+
+The input requires two data.frames:
+
+- `input_data`: this should be a data.frame where columns are samples and rows are variables.
+- `input_metadata`: this should be a data.frame where columns are variables and rows are samples.
+
+Importantly, the column names of `input_data` must match the rownames of `input_metadata` (a requirement for `MaAsLin2`.
+
+##### Formatting names
+
+If you are working with Gene Family data output from `HUMAnN` with KEGG Orthology names, there is an option in the custom function to process the standard 'Gene Family' names provided by `HUMAnN` into something that will look better when graphed (shorter, and without the KO and EC identifiers). These names will look something like: K00001: alcohol dehydrogenase [EC:1.1.1.1] or K00241: succinate dehydrogenase / fumarate reductase, cytochrome b subunit (the latter lacks the EC identifier). The `handle_humann_KO` argument handles both of these cases, and creates new columns in the fit results data.frame for `kegg_id`, `kegg_description`, and `ec_id` (where available).
+
+In the example genes above, the `kegg_description` values would be "alcohol dehydrogenase" and "succinate dehydrogenase / fumarate reductase, cytochrome b subunit" respectively.
+
+There will be a similar option coming that will allow processing of the standard HUMAnN pathway abundance/coverage names and gene names of UniRef90 origin (yet to be added).
+
+#### Running the function and looking at the output
+
+Running the function is very similar to running `maaslin2()`, however some of the additional arguments are set by default, including the `min_abundance`, `min_prevalence`, `normalization` and `transform` arguments. These can however all be modified as needed within the call to the `custom_Maaslin2()` function.
+
+By default, the output folder is simply `'maaslin2'`, but again this can be customised so that the MaAsLin2 output files are directed elsewhere.
+
+You can run the code as follows:
+
+```r
+
+```
