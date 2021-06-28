@@ -20,7 +20,7 @@ custom_Maaslin2 <- function(input_data, input_metadata, fixed_effects = '', rand
     arrange(qval)
   fit_res$feature <- factor(fit_res$feature, levels = rev(make.unique(fit_res$feature)))
   
-  if(handle_humann_KO) {
+  if(handle_humann_KO & dim(fit_res)[1] > 0) {
     # Separate out the KEGG id from the fit_res table feature column
     fit_res$kegg_id <- gsub('(K\\d*).*', '\\1', fit_res$feature)
     
@@ -44,14 +44,14 @@ custom_Maaslin2 <- function(input_data, input_metadata, fixed_effects = '', rand
   }
   
   # Plot the graph
-  if(handle_humann_KO){
+  if(handle_humann_KO & dim(fit_res)[1] > 0){
     # Plot MaAsLin2 fit results
     maaslin_plot <- ggplot(fit_res, aes(x = -log10(qval), y = kegg_description)) +
       geom_col(aes(fill = value)) +
       scale_fill_jama(name = 'Group') +
       labs(title = 'MaAsLin2 Results',
            y = 'KEGG Description')
-  } else {
+  } else if (!handle_humann_KO & dim(fit_res)[1] > 0){
     # Plot MaAsLin2 fit results
     maaslin_plot <- ggplot(fit_res, aes(x = -log10(qval), y = feature)) +
       geom_col(aes(fill = value)) +
@@ -60,7 +60,10 @@ custom_Maaslin2 <- function(input_data, input_metadata, fixed_effects = '', rand
            y = 'KEGG Description')
   }
   
-  output_list <- list(fit_res, maaslin_plot)
-  
-  output_list
+  if(dim(fit_res)[1] > 0){
+    output_list <- list(fit_res, maaslin_plot)
+    output_list
+  } else {
+    print('No significant results to report.')
+  }
 }
