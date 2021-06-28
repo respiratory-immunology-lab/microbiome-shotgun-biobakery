@@ -62,8 +62,17 @@ Running the function is very similar to running `maaslin2()`, however some of th
 
 By default, the output folder is simply `'maaslin2'`, but again this can be customised so that the MaAsLin2 output files are directed elsewhere.
 
-You can run the code as follows:
+Here is an example of running the code:
 
 ```r
-
+genefamilies_KO_maaslin <- custom_Maaslin2(input_data = bact_genefamilies_KO_unstrat,
+                                           input_metadata = input_metadata,
+                                           fixed_effects = c('timeframe'),
+                                           random_effects = c('Patient'),
+                                           output = here::here('output', 'maaslin2', 'genefamilies_KO_unstrat'),
+                                           handle_humann_KO = TRUE)
 ```
+You can then view the fit results (for the example) using `genefamilies_KO_maaslin[[1]]` and the plot using `genefamilies_KO_maaslin[[2]]`.
+
+The plot for the above example looks like this:
+
