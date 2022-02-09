@@ -58,7 +58,7 @@ The pipeline can be run using an interactive session or by wrapping everything u
 
 ```
 # Launch an interactive session
-smux n --mem-per-cpu=50G --ntasks=1 --cpus-per-task=6 --time=3-00:00:00 -J Humann
+smux n --mem-per-cpu=14G --ntasks=1 --cpus-per-task=24 --time=3-00:00:00 -J Humann
 
 # OR RECOMMENDED
 sbatch [script].sh
@@ -84,11 +84,11 @@ mkdir kneaddata_output
 for f in rawfastq/*_R1.fastq.gz
 do
   Basename=${f%_R*}
-  echo kneaddata -t 6 -p 6 --input ${Basename}_R1.fastq.gz --input ${Basename}_R2.fastq.gz \
+  echo kneaddata -t 1 -p 1 --input ${Basename}_R1.fastq.gz --input ${Basename}_R2.fastq.gz \
   --remove-intermediate-output --bypass-trf --output kneaddata_output \
   --trimmomatic /home/cpat0003/miniconda3/envs/biobakery3/bin/Trimmomatic-0.33 \
   -db /home/cpat0003/of33/Databases/shotgun/host/human/hg37dec_v0.1
-done | parallel -j 4
+done | parallel -j 24
 
 # Remove contaminant files to increase space
 rm -rf *contam*	
@@ -114,7 +114,7 @@ for f in kneaddata_output/*_kneaddata_paired_1.fastq
 do
   Basename=${f%_merged*}
   echo "ls ${Basename}*_kneaddata_paired* | xargs cat > ${Basename}_R1R2.fastq"
-done | parallel -j 36
+done | parallel -j 100%
 ```
 
 ### 2) Run MetaPhlAn and HUMAnN (version 3)
@@ -130,13 +130,13 @@ for f in kneaddata_output/*_R1R2.fastq
 do
   Basename=${f%_R*}
   Samplename=${Basename#*/}
-  echo humann -v --input ${Basename}_R1R2.fastq --threads 6 \
-  --bowtie-options "'-p 6 --very-sensitive-local'" \
+  echo humann -v --input ${Basename}_R1R2.fastq --threads 1 \
+  --bowtie-options "'-p 1 --very-sensitive-local'" \
   --nucleotide-database /projects/of33/Databases/shotgun/chocophlan \
   --protein-database /projects/of33/Databases/shotgun/uniref \
   --output humann_output/${Samplename} \
   --metaphlan-options "'--add_viruses --bt2_ps very-sensitive-local --min_alignment_len 100 --stat_q 0.1 --min_mapq_val -1'"
-done | parallel -j 6
+done | parallel -j 100%
 ```
 
 ### 3) Merge output tables
