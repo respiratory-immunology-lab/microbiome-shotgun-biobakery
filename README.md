@@ -135,7 +135,7 @@ do
   --nucleotide-database /projects/of33/Databases/shotgun/chocophlan \
   --protein-database /projects/of33/Databases/shotgun/uniref \
   --output humann_output/${Samplename} \
-  --metaphlan-options "'--add_viruses --bt2_ps very-sensitive-local --min_alignment_len 100'"
+  --metaphlan-options "'--add_viruses --bt2_ps very-sensitive-local --min_alignment_len 100 --stat_q 0.1 --min_mapq_val -1'"
 done | parallel -j 6
 ```
 
