@@ -58,7 +58,7 @@ The pipeline can be run using an interactive session or by wrapping everything u
 
 ```
 # Launch an interactive session
-smux n --mem-per-cpu=14G --ntasks=1 --cpus-per-task=24 --time=3-00:00:00 -J Humann
+smux n --mem=357G --ntasks=1 --cpuspertask=24 --time=3-00:00:00 -J Human
 
 # OR RECOMMENDED
 sbatch [script].sh
